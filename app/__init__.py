@@ -11,6 +11,13 @@ def create_app():
 
     from app.models import user,product,order
 
+    from app.routes.auth import auth_bp
+    app.register_blueprint(auth_bp,url_prefix="/auth")
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({"error": "Resource not found"}),404
+
     @app.route("/health")
     def health():
         return jsonify({"status":"ok"}),200
