@@ -9,6 +9,8 @@ def create_app():
     migrate.init_app(app,db)
     jwt.init_app(app)
 
+    from app.models import user,product,order
+
     @app.route("/health")
     def health():
         return jsonify({"status":"ok"}),200
