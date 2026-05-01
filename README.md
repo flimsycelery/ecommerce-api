@@ -4,6 +4,9 @@ A production-style REST API for an e-commerce platform built with Flask,
 SQLAlchemy, and JWT authentication. Features an ML-powered product 
 recommendation endpoint using sentence transformers and cosine similarity.
 
+## Live API
+Base URL: https://ecommerce-api-8zsy.onrender.com
+
 ## Tech Stack
 - **Backend:** Python, Flask, SQLAlchemy, Flask-Migrate
 - **Auth:** JWT (Flask-JWT-Extended), bcrypt
