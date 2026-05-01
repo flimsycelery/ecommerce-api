@@ -10,20 +10,33 @@ products_bp=Blueprint("products",__name__)
 @jwt_required()
 def get_products():
     category=request.args.get("category")
-    min_price=request.args.get("min_price",type=float)
-    max_price=request.args.get("max_price",type=float)
+    min_price=request.args.get("min_price", type=float)
+    max_price=request.args.get("max_price", type=float)
+    page=request.args.get("page", 1, type=int)
+    per_page=request.args.get("per_page", 10, type=int)
 
     query=Product.query
 
     if category:
         query=query.filter_by(category=category)
     if min_price is not None:
-        query=query.filter(Product.price>=min_price)
+        query=query.filter(Product.price >= min_price)
     if max_price is not None:
-        query=query.filter(Product.price<=max_price)
+        query=query.filter(Product.price <= max_price)
 
-    products=query.all()
-    return jsonify({"products":[p.to_dict() for p in products]}),200
+    paginated=query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return jsonify({
+        "products": [p.to_dict() for p in paginated.items],
+        "pagination": {
+            "page": paginated.page,
+            "per_page": paginated.per_page,
+            "total": paginated.total,
+            "pages": paginated.pages,
+            "has_next": paginated.has_next,
+            "has_prev": paginated.has_prev
+        }
+    }),200
 
 @products_bp.route("/<int:product_id>",methods=["GET"])
 @jwt_required()
