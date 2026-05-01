@@ -15,8 +15,9 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI="sqlite:///ecommerce.db"
 
 class ProductionConfig(Config):
-    DEBUG=False
-    SQLALCHEMY_DATABASE_URI=os.getenv("DATABASE_URL","")
+    DEBUG = False
+    _db_url = os.getenv("DATABASE_URL", "")
+    SQLALCHEMY_DATABASE_URI=_db_url.replace("postgresql://", "postgresql+psycopg2://") if _db_url else ""
 
 config_map={
     "development":DevelopmentConfig,
