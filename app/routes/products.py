@@ -6,12 +6,13 @@ from app.utils.auth_helpers import admin_required
 
 products_bp=Blueprint("products",__name__)
 
-@products_bp.route("",methods=["GET"])
+@products_bp.route("", methods=["GET"])
 @jwt_required()
 def get_products():
     category=request.args.get("category")
     min_price=request.args.get("min_price", type=float)
     max_price=request.args.get("max_price", type=float)
+    search=request.args.get("search")
     page=request.args.get("page", 1, type=int)
     per_page=request.args.get("per_page", 10, type=int)
 
@@ -23,6 +24,11 @@ def get_products():
         query=query.filter(Product.price >= min_price)
     if max_price is not None:
         query=query.filter(Product.price <= max_price)
+    if search:
+        query=query.filter(
+            Product.name.ilike(f"%{search}%") |
+            Product.description.ilike(f"%{search}%")
+        )
 
     paginated=query.paginate(page=page, per_page=per_page, error_out=False)
 
@@ -36,7 +42,7 @@ def get_products():
             "has_next": paginated.has_next,
             "has_prev": paginated.has_prev
         }
-    }),200
+    }), 200
 
 @products_bp.route("/<int:product_id>",methods=["GET"])
 @jwt_required()
