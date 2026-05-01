@@ -39,14 +39,3 @@ def login():
         "access_token":token,
         "user":user.to_dict()
     }),200
-
-
-@auth_bp.route("/make-admin", methods=["POST"])
-def make_admin():
-    data = request.get_json()
-    user = User.query.filter_by(email=data["email"]).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-    user.role = "admin"
-    db.session.commit()
-    return jsonify({"message": "Done", "user": user.to_dict()}), 200
