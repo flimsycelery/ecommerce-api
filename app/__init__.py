@@ -2,9 +2,9 @@ from flask import Flask, jsonify
 from app.config import get_config
 from app.extensions import db, migrate, jwt, limiter
 
-def create_app():
+def create_app(config=None):
     app = Flask(__name__)
-    app.config.from_object(get_config())
+    app.config.from_object(config or get_config())
 
     db.init_app(app)
     migrate.init_app(app, db)
