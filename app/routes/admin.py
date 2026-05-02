@@ -3,6 +3,7 @@ from app.extensions import db
 from app.models.order import Order
 from app.models.product import Product
 from app.utils.auth_helpers import admin_required
+from app.routes.recommendations import invalidate_cache
 
 admin_bp=Blueprint("admin",__name__)
 
@@ -47,5 +48,5 @@ def delete_product(product_id):
 
     db.session.delete(product)
     db.session.commit()
-
+    invalidate_cache()
     return jsonify({"message": f"Product {product.name} deleted"}), 200

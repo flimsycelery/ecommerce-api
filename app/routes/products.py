@@ -5,6 +5,7 @@ from app.extensions import db
 from app.models.product import Product
 from app.utils.auth_helpers import admin_required
 from app.schemas import ProductSchema
+from app.routes.recommendations import invalidate_cache
 
 products_bp = Blueprint("products", __name__)
 
@@ -73,4 +74,5 @@ def create_product():
     )
     db.session.add(product)
     db.session.commit()
+    invalidate_cache()
     return jsonify({"message": "Product created", "product": product.to_dict()}), 201
