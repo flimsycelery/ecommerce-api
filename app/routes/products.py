@@ -1,36 +1,39 @@
-from flask import Blueprint,request,jsonify
-from flask_jwt_extended import jwt_required,get_jwt_identity
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from marshmallow import ValidationError
 from app.extensions import db
 from app.models.product import Product
 from app.utils.auth_helpers import admin_required
+from app.schemas import ProductSchema
 
-products_bp=Blueprint("products",__name__)
+products_bp = Blueprint("products", __name__)
+
 
 @products_bp.route("", methods=["GET"])
 @jwt_required()
 def get_products():
-    category=request.args.get("category")
-    min_price=request.args.get("min_price", type=float)
-    max_price=request.args.get("max_price", type=float)
-    search=request.args.get("search")
-    page=request.args.get("page", 1, type=int)
-    per_page=request.args.get("per_page", 10, type=int)
+    category = request.args.get("category")
+    min_price = request.args.get("min_price", type=float)
+    max_price = request.args.get("max_price", type=float)
+    search = request.args.get("search")
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    query=Product.query
+    query = Product.query
 
     if category:
-        query=query.filter_by(category=category)
+        query = query.filter_by(category=category)
     if min_price is not None:
-        query=query.filter(Product.price >= min_price)
+        query = query.filter(Product.price >= min_price)
     if max_price is not None:
-        query=query.filter(Product.price <= max_price)
+        query = query.filter(Product.price <= max_price)
     if search:
-        query=query.filter(
+        query = query.filter(
             Product.name.ilike(f"%{search}%") |
             Product.description.ilike(f"%{search}%")
         )
 
-    paginated=query.paginate(page=page, per_page=per_page, error_out=False)
+    paginated = query.paginate(page=page, per_page=per_page, error_out=False)
 
     return jsonify({
         "products": [p.to_dict() for p in paginated.items],
@@ -44,20 +47,24 @@ def get_products():
         }
     }), 200
 
-@products_bp.route("/<int:product_id>",methods=["GET"])
+
+@products_bp.route("/<int:product_id>", methods=["GET"])
 @jwt_required()
 def get_product(product_id):
-    product=Product.query.get_or_404(product_id)
-    return jsonify({"product":product.to_dict()}),200
+    product = Product.query.get_or_404(product_id)
+    return jsonify({"product": product.to_dict()}), 200
 
-@products_bp.route("",methods=["POST"])
+
+@products_bp.route("", methods=["POST"])
 @admin_required
 def create_product():
-    data=request.get_json()
-    if not data or not all(k in data for k in ("name","description","price","stock","category")):
-        return jsonify({"error":"All fields are required"}),422
-    
-    product=Product(
+    schema = ProductSchema()
+    try:
+        data = schema.load(request.get_json())
+    except ValidationError as e:
+        return jsonify({"error": e.messages}), 422
+
+    product = Product(
         name=data["name"],
         description=data["description"],
         price=data["price"],
@@ -66,5 +73,4 @@ def create_product():
     )
     db.session.add(product)
     db.session.commit()
-
-    return jsonify({"message": "Product created","product":product.to_dict()}),201
+    return jsonify({"message": "Product created", "product": product.to_dict()}), 201
