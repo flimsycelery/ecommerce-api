@@ -14,6 +14,15 @@ Base URL: https://ecommerce-api-8zsy.onrender.com
 - **Database:** SQLite (development), PostgreSQL (production)
 - **Deployment:** Render
 
+## Features
+- JWT authentication with role-based access (customer/admin)
+- Product search and filtering by category and price
+- Pagination on all list endpoints
+- ML-powered recommendations using TF-IDF similarity
+- Rate limiting on auth endpoints (5 requests/minute)
+- Unit tested with pytest
+- Deployed on Render with PostgreSQL
+
 ## Setup
 
 ### 1. Clone the repo
