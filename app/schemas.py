@@ -27,3 +27,7 @@ class OrderItemSchema(Schema):
 
 class OrderSchema(Schema):
     items = fields.List(fields.Nested(OrderItemSchema), required=True, validate=validate.Length(min=1))
+
+class ReviewSchema(Schema):
+    rating  = fields.Int(required=True, validate=validate.Range(min=1, max=5))
+    comment = fields.Str(required=False, validate=validate.Length(max=500))

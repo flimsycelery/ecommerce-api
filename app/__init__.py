@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from app.config import get_config
 from app.extensions import db, migrate, jwt, limiter
-from app.routes.wishlist import wishlist_bp
 
 
 def create_app(config=None):
@@ -20,6 +19,8 @@ def create_app(config=None):
     from app.routes.orders import orders_bp
     from app.routes.admin import admin_bp
     from app.routes.recommendations import recommendations_bp
+    from app.routes.wishlist import wishlist_bp
+    from app.routes.reviews import reviews_bp
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(products_bp, url_prefix="/products")
@@ -27,6 +28,7 @@ def create_app(config=None):
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(recommendations_bp, url_prefix="/products")
     app.register_blueprint(wishlist_bp, url_prefix="/wishlist")
+    app.register_blueprint(reviews_bp, url_prefix="/products")
 
     @app.errorhandler(404)
     def not_found(e):
